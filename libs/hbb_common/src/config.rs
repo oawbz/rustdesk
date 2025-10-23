@@ -102,8 +102,8 @@ const CHARS: &[char] = &[
 ];
 
 //需要修改的位置
-pub const RENDEZVOUS_SERVERS: &[&str] = &["rs-ny.rustdesk.com"];
-pub const RS_PUB_KEY: &str = "OeVuKk5nlHiXp+APNn0Y3pC1Iwpwn44JGqrQCsWqmBw=";
+pub const RENDEZVOUS_SERVERS: &[&str] = &["10.100.5.100"];
+pub const RS_PUB_KEY: &str = "kLaAMBZgTggOspLZjvUZc+ibDWMuPMuv2X1cWnrrgi4=";
 
 pub const RENDEZVOUS_PORT: i32 = 21116;
 pub const RELAY_PORT: i32 = 21117;
