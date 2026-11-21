@@ -314,7 +314,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                 children: [
                   AutoSizeText(
                     translate(bind.mainGetBuildinOption(key: 'host-only') == 'Y' && !showOneTime
-                        ? "Permanent Password" : "One-time Password"),
+                        ? "Use permanent password" : "One-time Password"),
                     style: TextStyle(
                         fontSize: 14, color: textColor?.withOpacity(0.5)),
                     maxLines: 1,

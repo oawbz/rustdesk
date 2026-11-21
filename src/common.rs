@@ -129,9 +129,9 @@ pub fn init_sodium() {
 }
 
 pub fn global_init() -> bool {
+    init_sodium();
     #[cfg(feature = "host-only")]
     crate::host_policy::apply();
-    init_sodium();
     #[cfg(all(target_os = "linux", feature = "drm"))]
     crate::platform::linux::dispatch_wayland_display_probe();
     #[cfg(target_os = "linux")]
