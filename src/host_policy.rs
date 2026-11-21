@@ -21,7 +21,9 @@ pub fn apply() {
     drop(hard);
     let mut settings = config::OVERWRITE_SETTINGS.write().unwrap();
     for key in keys::KEYS_SETTINGS {
-        settings.insert((*key).to_owned(), String::new());
+        if ![keys::OPTION_PROXY_URL, keys::OPTION_PROXY_USERNAME, keys::OPTION_PROXY_PASSWORD].contains(key) {
+            settings.insert((*key).to_owned(), String::new());
+        }
     }
     for (key, value) in [
         ("custom-rendezvous-server", SERVER),
@@ -53,6 +55,7 @@ pub fn apply() {
         settings.insert(key.to_owned(), value.to_owned());
     }
     drop(settings);
+    config::Config::set_socks(None);
     let mut builtin = config::BUILTIN_SETTINGS.write().unwrap();
     for key in ["hide-general-settings", "hide-security-settings", "hide-network-settings",
         "hide-help-cards", "hide-server-settings", "hide-proxy-settings",
