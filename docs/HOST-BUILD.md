@@ -12,7 +12,8 @@ Camera, terminal, remote printing, LAN discovery, direct IP access, WebRTC,
 account/API access and official update checks are disabled in this build.
 On first hosting startup, a unique 20-character permanent password is generated
 if none exists. It persists across restarts. The initial password is stored
-encrypted locally and can be revealed/copied from the main window. A manually
+encrypted locally (using RustDesk's existing machine-bound storage mechanism;
+this does not protect it from a local administrator) and can be revealed/copied from the main window. A manually
 changed password is not recoverable from that initial-password view. The user
 can change the permanent password, access approval mode, temporary password
 length/numeric option, or select either/both password types. There is no shared

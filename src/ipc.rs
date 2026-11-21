@@ -1093,6 +1093,8 @@ async fn handle(data: Data, stream: &mut Connection) {
                 allow_err!(stream.send(&Data::Options(Some(v))).await);
             }
             Some(value) => {
+                #[cfg(feature = "host-only")]
+                let value = crate::host_policy::preserve_generated_password(value);
                 let _chk = CheckIfRestart::new();
                 let _nat = CheckTestNatType::new();
                 if let Some(v) = value.get("privacy-mode-impl-key") {

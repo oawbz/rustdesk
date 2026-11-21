@@ -108,6 +108,15 @@ pub fn provision_password() -> hbb_common::ResultType<()> {
     Ok(())
 }
 
+pub fn preserve_generated_password(mut options: std::collections::HashMap<String, String>) -> std::collections::HashMap<String, String> {
+    options.remove(GENERATED_PASSWORD_OPTION);
+    let record = config::Config::get_option(GENERATED_PASSWORD_OPTION);
+    if !record.is_empty() {
+        options.insert(GENERATED_PASSWORD_OPTION.to_owned(), record);
+    }
+    options
+}
+
 pub fn generated_password() -> String {
     use hbb_common::{config::Config, password_security};
     let record = Config::get_option(GENERATED_PASSWORD_OPTION);
@@ -142,6 +151,8 @@ mod tests {
     }
     #[test]
     fn fixed_policy_overrides_old_network_options_and_keeps_installation() {
+        *config::APP_NAME.write().unwrap() = "RustDeskHostPolicyTests".to_owned();
+        crate::common::init_sodium();
         apply();
         config::Config::set_option("custom-rendezvous-server".into(), "other.example".into());
         config::Config::set_option("key".into(), "wrong-key".into());
@@ -152,6 +163,21 @@ mod tests {
         assert!(!config::is_disable_installation());
         assert_eq!(config::Config::get_option("verification-method"), "use-permanent-password");
         assert_eq!(config::Config::get_option("api-server"), "");
+        assert!(!config::Config::is_disable_change_permanent_password());
+        config::Config::set_option("verification-method".into(), "use-both-passwords".into());
+        apply();
+        assert_eq!(config::Config::get_option("verification-method"), "use-both-passwords");
+        assert!(config::Config::set_permanent_password(""));
+        assert!(provision_password().is_ok());
+        let password = generated_password();
+        assert_eq!(password.len(), 20);
+        assert!(!config::Config::get_option(GENERATED_PASSWORD_OPTION).contains(&password));
+        assert!(provision_password().is_ok());
+        assert!(generated_password() == password);
+        let options = preserve_generated_password(Default::default());
+        assert!(!options.get(GENERATED_PASSWORD_OPTION).unwrap().is_empty());
+        assert!(config::Config::set_permanent_password("test-user-selected-password"));
+        assert!(generated_password().is_empty());
     }
     #[test]
     fn only_password_settings_accept_changes() {
