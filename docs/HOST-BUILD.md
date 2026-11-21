@@ -1,6 +1,8 @@
 # Windows host-only build
 
-This fork's `host-only` Cargo feature builds a locked incoming-only client.
+This fork's `host-only` Cargo feature builds an incoming-only client named
+`AwbzHost`, with its own configuration, Windows service and installation path
+to avoid reusing an existing RustDesk controller's configuration.
 ID and relay server: `home.awbz.cn`. API disabled. Public key:
 `sUEp2zK93vGOtk21nS66OOL2CD3ughHpgj3PAzlZ+cQ=`.
 
