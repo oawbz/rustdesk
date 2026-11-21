@@ -254,7 +254,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
   }
 
   Widget buildPopupMenu(BuildContext context) {
-    if (bind.isIncomingOnly() && bind.isDisableSettings()) {
+    if (bind.mainGetBuildinOption(key: 'host-only') == 'Y') {
       return const SizedBox.shrink();
     }
     final textColor = Theme.of(context).textTheme.titleLarge?.color;
@@ -600,7 +600,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
       String? closeOption}) {
     if (bind.mainGetBuildinOption(key: kOptionHideHelpCards) == 'Y' &&
         content != 'install_daemon_tip' &&
-        !(bind.isIncomingOnly() && bind.isDisableSettings() &&
+        !(bind.mainGetBuildinOption(key: 'host-only') == 'Y' &&
             (btnText == 'Install' || btnText == 'Click to upgrade'))) {
       return const SizedBox();
     }

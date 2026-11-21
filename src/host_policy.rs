@@ -57,7 +57,7 @@ pub fn apply() {
     drop(settings);
     config::Config::set_socks(None);
     let mut builtin = config::BUILTIN_SETTINGS.write().unwrap();
-    for key in ["hide-general-settings", "hide-security-settings", "hide-network-settings",
+    for key in ["host-only", "hide-general-settings", "hide-security-settings", "hide-network-settings",
         "hide-help-cards", "hide-server-settings", "hide-proxy-settings",
         "hide-remote-printer-settings", "hide-stop-service", "disable-change-id",
         "disable-change-permanent-password", "disable-unlock-pin"] {
