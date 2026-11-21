@@ -130,6 +130,10 @@ pub fn new_for_test() -> ServerPtr {
 }
 
 pub fn new() -> ServerPtr {
+    #[cfg(feature = "host-only")]
+    if let Err(error) = crate::host_policy::provision_password() {
+        log::error!("Host password provisioning failed: {error}");
+    }
     let mut server = Server {
         connections: HashMap::new(),
         services: HashMap::new(),

@@ -2765,6 +2765,10 @@ pub fn main_get_printer_names() -> SyncReturn<String> {
 }
 
 pub fn main_get_common(key: String) -> String {
+    #[cfg(feature = "host-only")]
+    if key == "host-generated-password" {
+        return crate::ipc::get_config("host-generated-password").ok().flatten().unwrap_or_default();
+    }
     if key == "is-printer-installed" {
         #[cfg(target_os = "windows")]
         {

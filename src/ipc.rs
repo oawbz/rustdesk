@@ -964,6 +964,11 @@ async fn handle(data: Data, stream: &mut Connection) {
                 let value;
                 if name == "id" {
                     value = Some(Config::get_id());
+                } else if name == "host-generated-password" && cfg!(feature = "host-only") {
+                    #[cfg(feature = "host-only")]
+                    { value = Some(crate::host_policy::generated_password()); }
+                    #[cfg(not(feature = "host-only"))]
+                    { value = None; }
                 } else if name == "temporary-password" {
                     value = Some(password::temporary_password());
                 } else if name == "permanent-password-storage-and-salt" {
@@ -1048,6 +1053,10 @@ async fn handle(data: Data, stream: &mut Connection) {
                     // Explicitly ACK/NACK permanent-password writes. This allows UIs/FFI to
                     // distinguish "accepted by daemon" vs "IPC send succeeded" without
                     // reading back any secret.
+                    #[cfg(feature = "host-only")]
+                    if updated {
+                        Config::set_option(crate::host_policy::GENERATED_PASSWORD_OPTION.to_owned(), String::new());
+                    }
                     let ack = if updated { "Y" } else { "N" }.to_owned();
                     allow_err!(stream.send(&Data::Config((name.clone(), Some(ack)))).await);
                 } else if name == "salt" {

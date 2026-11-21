@@ -254,9 +254,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
   }
 
   Widget buildPopupMenu(BuildContext context) {
-    if (bind.mainGetBuildinOption(key: 'host-only') == 'Y') {
-      return const SizedBox.shrink();
-    }
+
     final textColor = Theme.of(context).textTheme.titleLarge?.color;
     RxBool hover = false.obs;
     return InkWell(
@@ -315,7 +313,8 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   AutoSizeText(
-                    translate("One-time Password"),
+                    translate(bind.mainGetBuildinOption(key: 'host-only') == 'Y' && !showOneTime
+                        ? "Permanent Password" : "One-time Password"),
                     style: TextStyle(
                         fontSize: 14, color: textColor?.withOpacity(0.5)),
                     maxLines: 1,
@@ -360,7 +359,29 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                           ),
                           onHover: (value) => refreshHover.value = value,
                         ).marginOnly(right: 8, top: 4),
-                      if (!bind.isDisableSettings())
+                      if (bind.mainGetBuildinOption(key: 'host-only') == 'Y')
+                        IconButton(
+                          icon: const Icon(Icons.visibility_outlined),
+                          tooltip: '查看初始固定密码',
+                          onPressed: () async {
+                            final password = await bind.mainGetCommon(key: 'host-generated-password');
+                            if (!mounted) return;
+                            showDialog<void>(context: context, builder: (dialogContext) => AlertDialog(
+                              title: const Text('初始固定密码'),
+                              content: SelectableText(password.isEmpty
+                                  ? '固定密码已由用户设置，请使用自己的密码；也可在密码设置中修改。'
+                                  : password),
+                              actions: [
+                                if (password.isNotEmpty) TextButton(
+                                  onPressed: () => Clipboard.setData(ClipboardData(text: password)),
+                                  child: Text(translate('Copy'))),
+                                TextButton(onPressed: () => Navigator.pop(dialogContext),
+                                  child: Text(translate('Close'))),
+                              ],
+                            ));
+                          },
+                        ),
+                      if (bind.mainGetBuildinOption(key: 'host-only') == 'Y' || !bind.isDisableSettings())
                         InkWell(
                           child: Tooltip(
                             message: translate('Change Password'),

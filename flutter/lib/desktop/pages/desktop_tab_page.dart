@@ -20,7 +20,7 @@ class DesktopTabPage extends StatefulWidget {
 
   static void onAddSetting(
       {SettingsTabKey initialPage = SettingsTabKey.general}) {
-    if (bind.mainGetBuildinOption(key: 'host-only') == 'Y') return;
+    if (bind.mainGetBuildinOption(key: 'host-only') == 'Y') initialPage = SettingsTabKey.safety;
     try {
       DesktopTabController tabController = Get.find<DesktopTabController>();
       tabController.add(TabInfo(

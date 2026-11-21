@@ -461,7 +461,8 @@ pub fn set_auth_option(key: String, value: String) -> hbb_common::ResultType<()>
 
 #[inline]
 pub fn set_option(key: String, value: String) {
-    if cfg!(feature = "host-only") {
+    #[cfg(feature = "host-only")]
+    if !crate::host_policy::allows_password_value(&key, &value) {
         return;
     }
     if key == "2fa"

@@ -63,7 +63,9 @@ enum SettingsTabKey {
 
 class DesktopSettingPage extends StatefulWidget {
   final SettingsTabKey initialTabkey;
-  static final List<SettingsTabKey> tabKeys = [
+  static final List<SettingsTabKey> tabKeys =
+      bind.mainGetBuildinOption(key: 'host-only') == 'Y'
+      ? [SettingsTabKey.safety] : [
     if (bind.mainGetBuildinOption(key: kOptionHideGeneralSetting) != 'Y')
       SettingsTabKey.general,
     if (!isWeb &&
@@ -1037,12 +1039,14 @@ class _SafetyState extends State<_Safety> with AutomaticKeepAliveClientMixin {
             preventMouseKeyBuilder(
               block: locked,
               child: Column(children: [
-                permissions(context),
+                if (bind.mainGetBuildinOption(key: 'host-only') != 'Y') permissions(context),
                 password(context),
+                if (bind.mainGetBuildinOption(key: 'host-only') != 'Y') ...[
                 _Card(title: '2FA', children: [tfa()]),
                 if (!isChangeIdDisabled())
                   _Card(title: 'ID', children: [changeId()]),
                 more(context),
+                ],
               ]),
             ),
           ],

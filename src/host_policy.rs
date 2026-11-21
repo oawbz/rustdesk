@@ -21,7 +21,7 @@ pub fn apply() {
     drop(hard);
     let mut settings = config::OVERWRITE_SETTINGS.write().unwrap();
     for key in keys::KEYS_SETTINGS {
-        if ![keys::OPTION_PROXY_URL, keys::OPTION_PROXY_USERNAME, keys::OPTION_PROXY_PASSWORD].contains(key) {
+        if !is_password_option(key) && ![keys::OPTION_PROXY_URL, keys::OPTION_PROXY_USERNAME, keys::OPTION_PROXY_PASSWORD].contains(key) {
             settings.insert((*key).to_owned(), String::new());
         }
     }
@@ -31,9 +31,6 @@ pub fn apply() {
         ("relay-server", SERVER),
         ("api-server", ""),
         ("key", PUBLIC_KEY),
-        ("verification-method", "use-temporary-password"),
-        ("temporary-password-length", "10"),
-        ("approve-mode", "password"),
         ("enable-keyboard", "Y"),
         ("enable-clipboard", "Y"),
         ("enable-file-transfer", "Y"),
@@ -60,14 +57,68 @@ pub fn apply() {
     for key in ["host-only", "hide-general-settings", "hide-security-settings", "hide-network-settings",
         "hide-help-cards", "hide-server-settings", "hide-proxy-settings",
         "hide-remote-printer-settings", "hide-stop-service", "disable-change-id",
-        "disable-change-permanent-password", "disable-unlock-pin"] {
+        "disable-unlock-pin"] {
         builtin.insert(key.to_owned(), "Y".to_owned());
     }
     builtin.insert("register-device".to_owned(), "N".to_owned());
     drop(builtin);
+    let mut defaults = config::DEFAULT_SETTINGS.write().unwrap();
+    defaults.insert("verification-method".to_owned(), "use-permanent-password".to_owned());
+    defaults.insert("temporary-password-length".to_owned(), "10".to_owned());
+    defaults.insert("approve-mode".to_owned(), "password".to_owned());
+    drop(defaults);
     let mut local = config::OVERWRITE_LOCAL_SETTINGS.write().unwrap();
     local.insert("enable-check-update".to_owned(), "N".to_owned());
     local.insert("enable-webrtc".to_owned(), "N".to_owned());
+}
+
+pub const GENERATED_PASSWORD_OPTION: &str = "host-generated-password";
+
+pub fn is_password_option(key: &str) -> bool {
+    matches!(key, "verification-method" | "temporary-password-length" |
+        "approve-mode" | "allow-numeric-one-time-password")
+}
+
+pub fn allows_password_value(key: &str, value: &str) -> bool {
+    match key {
+        "verification-method" => matches!(value, "use-temporary-password" | "use-permanent-password" | "use-both-passwords"),
+        "temporary-password-length" => matches!(value, "6" | "8" | "10"),
+        "approve-mode" => matches!(value, "" | "password" | "click" | "password-click"),
+        "allow-numeric-one-time-password" => matches!(value, "" | "Y" | "N"),
+        _ => false,
+    }
+}
+
+pub fn provision_password() -> hbb_common::ResultType<()> {
+    use hbb_common::{bail, config::Config, password_security};
+    if Config::has_permanent_password() {
+        return Ok(());
+    }
+    let password = Config::get_auto_password(20);
+    let encrypted = password_security::encrypt_str_or_original(&password, "00", 1024);
+    if encrypted == password || encrypted.is_empty() {
+        bail!("Cannot securely store the generated host password");
+    }
+    if !Config::set_permanent_password(&password) {
+        bail!("Cannot provision the host password");
+    }
+    let (storage, _) = Config::get_local_permanent_password_storage_and_salt();
+    let record = serde_json::to_string(&(encrypted, storage))?;
+    Config::set_option(GENERATED_PASSWORD_OPTION.to_owned(), record);
+    Ok(())
+}
+
+pub fn generated_password() -> String {
+    use hbb_common::{config::Config, password_security};
+    let record = Config::get_option(GENERATED_PASSWORD_OPTION);
+    let Ok((encrypted, expected_storage)) = serde_json::from_str::<(String, String)>(&record) else {
+        return String::new();
+    };
+    if Config::get_local_permanent_password_storage_and_salt().0 != expected_storage {
+        return String::new();
+    }
+    let (password, decrypted, _) = password_security::decrypt_str_or_original(&encrypted, "00");
+    if decrypted { password } else { String::new() }
 }
 
 pub fn allows_args(args: impl IntoIterator<Item = String>) -> bool {
@@ -99,8 +150,16 @@ mod tests {
         assert!(config::is_incoming_only());
         assert!(config::is_disable_settings());
         assert!(!config::is_disable_installation());
-        assert_eq!(config::Config::get_option("verification-method"), "use-temporary-password");
+        assert_eq!(config::Config::get_option("verification-method"), "use-permanent-password");
         assert_eq!(config::Config::get_option("api-server"), "");
+    }
+    #[test]
+    fn only_password_settings_accept_changes() {
+        assert!(allows_password_value("verification-method", "use-permanent-password"));
+        assert!(allows_password_value("approve-mode", "password-click"));
+        assert!(allows_password_value("temporary-password-length", "8"));
+        assert!(!allows_password_value("temporary-password-length", "1"));
+        assert!(!allows_password_value("relay-server", "other.example"));
     }
     #[test]
     fn installation_and_service_commands_are_preserved() {
