@@ -92,6 +92,15 @@ class _DesktopHomePageState extends State<DesktopHomePage>
       buildTip(context),
       if (!isOutgoingOnly) buildIDBoard(context),
       if (!isOutgoingOnly) buildPasswordBoard(context),
+      if (bind.mainGetBuildinOption(key: 'host-only') == 'Y')
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+          child: ElevatedButton.icon(
+            onPressed: () => _copyHostCredentials(),
+            icon: const Icon(Icons.copy, size: 18),
+            label: const Text('复制 ID 和密码'),
+          ),
+        ),
       FutureBuilder<Widget>(
         future: Future.value(
             Obx(() => buildHelpCards(stateGlobal.updateUrl.value))),
@@ -185,6 +194,32 @@ class _DesktopHomePageState extends State<DesktopHomePage>
     );
   }
 
+  Future<void> _copyHostCredentials({bool includeId = true, bool includePassword = true}) async {
+    final model = gFFI.serverModel;
+    final id = model.serverId.text.replaceAll(' ', '');
+    var password = '';
+    if (includePassword) {
+      if (model.approveMode == 'click') {
+        showToast('当前仅允许点击授权，无需密码');
+        return;
+      }
+      if (model.verificationMethod != kUseTemporaryPassword) {
+        password = await bind.mainGetCommon(key: 'host-generated-password');
+      }
+      if (password.isEmpty && model.verificationMethod != kUsePermanentPassword) {
+        password = await bind.mainGetTemporaryPassword();
+      }
+      if (password.isEmpty || password == '-') {
+        showToast('密码尚未就绪或已由你手动修改，无法读取明文；可在密码设置中重新设置');
+        return;
+      }
+    }
+    final text = includeId && includePassword ? 'ID: $id\n密码: $password'
+        : includeId ? id : password;
+    await Clipboard.setData(ClipboardData(text: text));
+    showToast(translate('Copied'));
+  }
+
   buildIDBoard(BuildContext context) {
     final model = gFFI.serverModel;
     return Container(
@@ -220,7 +255,17 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                                   ?.color
                                   ?.withOpacity(0.5)),
                         ).marginOnly(top: 5),
-                        buildPopupMenu(context)
+                        Row(mainAxisSize: MainAxisSize.min, children: [
+                          if (bind.mainGetBuildinOption(key: 'host-only') == 'Y')
+                            IconButton(
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints.tightFor(width: 24, height: 24),
+                              icon: const Icon(Icons.copy, size: 18),
+                              tooltip: '复制 ID',
+                              onPressed: () => _copyHostCredentials(includePassword: false),
+                            ),
+                          buildPopupMenu(context),
+                        ])
                       ],
                     ),
                   ),
@@ -359,6 +404,12 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                           ),
                           onHover: (value) => refreshHover.value = value,
                         ).marginOnly(right: 8, top: 4),
+                      if (bind.mainGetBuildinOption(key: 'host-only') == 'Y')
+                        IconButton(
+                          icon: const Icon(Icons.copy, size: 18),
+                          tooltip: '复制密码',
+                          onPressed: () => _copyHostCredentials(includeId: false),
+                        ),
                       if (bind.mainGetBuildinOption(key: 'host-only') == 'Y')
                         IconButton(
                           icon: const Icon(Icons.visibility_outlined),

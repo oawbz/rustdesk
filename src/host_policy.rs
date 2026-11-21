@@ -31,15 +31,16 @@ pub fn apply() {
         ("relay-server", SERVER),
         ("api-server", ""),
         ("key", PUBLIC_KEY),
+        ("access-mode", "full"),
         ("enable-keyboard", "Y"),
         ("enable-clipboard", "Y"),
         ("enable-file-transfer", "Y"),
         ("enable-tunnel", "Y"),
         ("enable-remote-restart", "Y"),
         ("enable-audio", "Y"),
-        ("enable-camera", "N"),
-        ("enable-terminal", "N"),
-        ("enable-remote-printer", "N"),
+        ("enable-camera", "Y"),
+        ("enable-terminal", "Y"),
+        ("enable-remote-printer", "Y"),
         ("enable-lan-discovery", "N"),
         ("enable-trusted-devices", "N"),
         ("allow-remote-config-modification", "N"),
@@ -161,6 +162,7 @@ mod tests {
         assert!(config::is_incoming_only());
         assert!(config::is_disable_settings());
         assert!(!config::is_disable_installation());
+        assert_eq!(config::Config::get_option("access-mode"), "full");
         assert_eq!(config::Config::get_option("verification-method"), "use-permanent-password");
         assert_eq!(config::Config::get_option("api-server"), "");
         assert!(!config::Config::is_disable_change_permanent_password());
