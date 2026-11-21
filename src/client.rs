@@ -387,6 +387,9 @@ impl Client {
         ),
         (i32, String),
     )> {
+        if cfg!(feature = "host-only") {
+            bail!("Outgoing connections are disabled in this host-only build");
+        }
         debug_assert!(peer == interface.get_id());
         interface.update_direct(None);
         interface.update_received(false);

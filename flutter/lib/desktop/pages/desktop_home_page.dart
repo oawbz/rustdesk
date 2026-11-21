@@ -254,6 +254,9 @@ class _DesktopHomePageState extends State<DesktopHomePage>
   }
 
   Widget buildPopupMenu(BuildContext context) {
+    if (bind.isIncomingOnly() && bind.isDisableSettings()) {
+      return const SizedBox.shrink();
+    }
     final textColor = Theme.of(context).textTheme.titleLarge?.color;
     RxBool hover = false.obs;
     return InkWell(
@@ -596,7 +599,9 @@ class _DesktopHomePageState extends State<DesktopHomePage>
       bool? closeButton,
       String? closeOption}) {
     if (bind.mainGetBuildinOption(key: kOptionHideHelpCards) == 'Y' &&
-        content != 'install_daemon_tip') {
+        content != 'install_daemon_tip' &&
+        !(bind.isIncomingOnly() && bind.isDisableSettings() &&
+            (btnText == 'Install' || btnText == 'Click to upgrade'))) {
       return const SizedBox();
     }
     void closeCard() async {

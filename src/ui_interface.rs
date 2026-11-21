@@ -423,6 +423,9 @@ pub fn set_options(m: HashMap<String, String>) {
 }
 
 pub fn try_set_options(m: HashMap<String, String>) -> hbb_common::ResultType<()> {
+    if cfg!(feature = "host-only") {
+        hbb_common::bail!("Settings are fixed in this host-only build");
+    }
     #[cfg(not(any(target_os = "android", target_os = "ios")))]
     {
         if !crate::trusted_devices::config::changes_authentication(&m) {
@@ -458,6 +461,9 @@ pub fn set_auth_option(key: String, value: String) -> hbb_common::ResultType<()>
 
 #[inline]
 pub fn set_option(key: String, value: String) {
+    if cfg!(feature = "host-only") {
+        return;
+    }
     if key == "2fa"
         || key == keys::OPTION_ENABLE_TRUSTED_DEVICES
         || key == keys::OPTION_TRUSTED_DEVICE_EXPIRATION

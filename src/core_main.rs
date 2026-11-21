@@ -47,6 +47,12 @@ pub fn core_main() -> Option<CoreMainAction> {
         return None;
     }
     crate::load_custom_client();
+    #[cfg(feature = "host-only")]
+    if !crate::host_policy::allows_args(std::env::args().skip(1)) {
+        return Some(CoreMainAction::ExitFailure(
+            hbb_common::anyhow::anyhow!("This client only accepts incoming connections; settings are managed by the build."),
+        ));
+    }
     #[cfg(windows)]
     if !crate::platform::windows::bootstrap() {
         // return None to terminate the process

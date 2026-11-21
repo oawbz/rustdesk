@@ -1318,6 +1318,9 @@ pub fn session_add(
     conn_token: Option<String>,
     login_method: &str,
 ) -> ResultType<FlutterSession> {
+    if cfg!(feature = "host-only") {
+        bail!("Outgoing sessions are disabled in this host-only build");
+    }
     let conn_type = if is_file_transfer {
         ConnType::FILE_TRANSFER
     } else if is_view_camera {

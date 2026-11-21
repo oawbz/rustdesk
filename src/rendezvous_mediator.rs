@@ -741,6 +741,8 @@ impl RendezvousMediator {
         webrtc_sdp_answer: String,
         meta: ConnectionMeta,
     ) -> ResultType<()> {
+        #[cfg(feature = "host-only")]
+        let relay_server = format!("{}:{}", crate::host_policy::SERVER, config::RELAY_PORT);
         let peer_addr = AddrMangle::decode(&socket_addr);
         log::info!(
             "create_relay requested from {:?}, relay_server: {}, uuid: {}, secure: {}",

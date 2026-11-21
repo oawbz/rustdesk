@@ -116,6 +116,8 @@ def make_parser():
         default='',
         help='Integrate features, windows only.'
              'Available: [Not used for now]. Special value is "ALL" and empty "". Default is empty.')
+    parser.add_argument('--host-only', action='store_true',
+                        help='Build the locked incoming-only client')
     parser.add_argument('--flutter', action='store_true',
                         help='Build flutter package', default=False)
     parser.add_argument(
@@ -314,6 +316,8 @@ def linux_packaging_branch():
 
 def get_features(args):
     features = ['inline'] if not args.flutter else []
+    if args.host_only:
+        features.append('host-only')
     if args.hwcodec:
         features.append('hwcodec')
     if args.vram:

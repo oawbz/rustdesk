@@ -13,6 +13,8 @@ pub use platform::{
 mod server;
 #[cfg(not(any(target_os = "ios")))]
 pub use self::server::*;
+#[cfg(feature = "host-only")]
+mod host_policy;
 mod client;
 mod lan;
 #[cfg(not(any(target_os = "ios")))]
