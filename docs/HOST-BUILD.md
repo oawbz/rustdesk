@@ -11,7 +11,9 @@ clipboard, audio, file transfer, TCP tunneling and restart remain available.
 Remote permissions default to full access, including terminal, camera and
 remote printing where the OS and installed drivers support them. Drivers are
 not automatically installed by the permission policy. Windows administrator
-rights still require normal UAC authorization/service installation. LAN
+rights still require normal UAC authorization/service installation. Portable
+startup requests an elevated helper through the upstream pre-elevate-service
+flow; it does not bypass UAC. LAN
 discovery, direct IP access, WebRTC, account/API access and official update
 checks are disabled. Network/permission settings remain locked.
 On first hosting startup, a unique 20-character permanent password is generated

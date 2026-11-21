@@ -69,6 +69,7 @@ pub fn apply() {
     defaults.insert("approve-mode".to_owned(), "password".to_owned());
     drop(defaults);
     let mut local = config::OVERWRITE_LOCAL_SETTINGS.write().unwrap();
+    local.insert("pre-elevate-service".to_owned(), "Y".to_owned());
     local.insert("enable-check-update".to_owned(), "N".to_owned());
     local.insert("enable-webrtc".to_owned(), "N".to_owned());
 }
