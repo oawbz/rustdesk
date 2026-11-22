@@ -19,7 +19,7 @@ env:
   LLVM_VERSION: '15.0.6'
   FLUTTER_VERSION: '3.24.5'
   VCPKG_COMMIT_ID: '9e593bb18ea69cc5095e012465dcd675a822ed0d'
-  VCPKG_BINARY_SOURCES: 'clear;x-gha,readwrite'
+  VCPKG_BINARY_SOURCES: 'clear;files,${{ github.workspace }}/.vcpkg-binary-cache,readwrite'
 
 jobs:
   generate-bridge:
@@ -160,7 +160,16 @@ jobs:
         with:
           vcpkgDirectory: C:\vcpkg
           vcpkgGitCommitId: ${{ env.VCPKG_COMMIT_ID }}
-          doNotCache: false
+          doNotCache: true
+
+      - name: Restore vcpkg package files
+        id: vcpkg-packages
+        uses: actions/cache/restore@v4
+        with:
+          path: .vcpkg-binary-cache
+          key: vcpkg-windows-x64-${{ env.VCPKG_COMMIT_ID }}-${{ hashFiles('vcpkg.json', 'res/vcpkg/**', '.github/workflows/windows-host.yml') }}
+          restore-keys: |
+            vcpkg-windows-x64-${{ env.VCPKG_COMMIT_ID }}-
 
       - name: Install vcpkg dependencies
         env:
@@ -181,6 +190,13 @@ jobs:
           fi
           head -n 100 "${VCPKG_ROOT}/buildtrees/ffmpeg/build-${{ matrix.job.vcpkg-triplet }}-rel-out.log" || true
         shell: bash
+
+      - name: Save vcpkg package files
+        if: steps.vcpkg-packages.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .vcpkg-binary-cache
+          key: ${{ steps.vcpkg-packages.outputs.cache-primary-key }}
 
       - name: Set SODIUM_LIB_DIR (arm64)
         # libsodium-sys ships no arm64 Windows prebuilt lib; point it at the vcpkg-built one
