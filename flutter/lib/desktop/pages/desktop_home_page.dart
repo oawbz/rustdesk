@@ -1010,6 +1010,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
 }
 
 void setPasswordDialog({VoidCallback? notEmptyCallback}) async {
+  final isHostOnly = bind.mainGetBuildinOption(key: 'host-only') == 'Y';
   final p0 = TextEditingController(text: "");
   final p1 = TextEditingController(text: "");
   var errMsg0 = "";
@@ -1037,7 +1038,9 @@ void setPasswordDialog({VoidCallback? notEmptyCallback}) async {
 
   gFFI.dialogManager.show((setState, close, context) {
     updateCanSubmit() {
-      canSubmit = p0.text.trim().isNotEmpty || p1.text.trim().isNotEmpty;
+      canSubmit = isHostOnly
+          ? p0.text.trim().isNotEmpty
+          : p0.text.trim().isNotEmpty || p1.text.trim().isNotEmpty;
     }
 
     submit() async {
@@ -1049,7 +1052,7 @@ void setPasswordDialog({VoidCallback? notEmptyCallback}) async {
         errMsg1 = "";
       });
       final pass = p0.text.trim();
-      if (pass.isNotEmpty) {
+      if (pass.isNotEmpty && !isHostOnly) {
         final Iterable violations = rules.where((r) => !r.validate(pass));
         if (violations.isNotEmpty) {
           setState(() {
@@ -1117,7 +1120,7 @@ void setPasswordDialog({VoidCallback? notEmptyCallback}) async {
                 ),
               ],
             ),
-            Row(
+            if (!isHostOnly) Row(
               children: [
                 Expanded(child: PasswordStrengthIndicator(password: rxPass)),
               ],

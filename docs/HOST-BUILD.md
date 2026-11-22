@@ -18,7 +18,7 @@ startup requests an elevated helper through the upstream pre-elevate-service
 flow; it does not bypass UAC. LAN
 discovery, direct IP access, WebRTC, account/API access and official update
 checks are disabled. Network/permission settings remain locked.
-On first hosting startup, a unique 20-character permanent password is generated
+On first hosting startup, a unique 8-character permanent password is generated
 if none exists. It persists across restarts. The initial password is stored
 encrypted locally (using RustDesk's existing machine-bound storage mechanism;
 this does not protect it from a local administrator) and can be revealed/copied from the main window. A manually
@@ -47,3 +47,5 @@ at https://github.com/oawbz/rustdesk (AGPL-3.0).
 被控版仅使用固定密码，主页修改按钮直接弹出改密窗口；不提供设置页面、一次性密码或授权方式切换。隐藏主页支持标语和安装说明文字，保留安装按钮。主程序和交付文件名均为 Klink.exe，使用独立 Klink 安装、服务和配置名称，避免与原版 RustDesk 冲突。
 
 The Klink Windows tray Quit action stops its service and exits Klink processes while retaining the service registration, startup shortcut and installed files. Opening an installed Klink starts its service if stopped, and repairs a missing registration left by an older version. Starting or stopping the service may require UAC approval.
+
+Klink automatically generates an 8-character password for a new device. Existing passwords are preserved. Manual passwords have no minimum length or character-complexity rule; nonempty matching confirmation and the existing storage limit still apply.

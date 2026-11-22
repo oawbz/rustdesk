@@ -100,7 +100,7 @@ pub fn provision_password() -> hbb_common::ResultType<()> {
     if Config::has_permanent_password() {
         return Ok(());
     }
-    let password = Config::get_auto_password(20);
+    let password = Config::get_auto_password(8);
     let encrypted = password_security::encrypt_str_or_original(&password, "00", 1024);
     if encrypted == password || encrypted.is_empty() {
         bail!("Cannot securely store the generated host password");
@@ -177,7 +177,7 @@ mod tests {
         assert!(config::Config::set_permanent_password(""));
         assert!(provision_password().is_ok());
         let password = generated_password();
-        assert_eq!(password.len(), 20);
+        assert_eq!(password.len(), 8);
         assert!(!config::Config::get_option(GENERATED_PASSWORD_OPTION).contains(&password));
         assert!(provision_password().is_ok());
         assert!(generated_password() == password);
