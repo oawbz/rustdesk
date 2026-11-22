@@ -49,3 +49,5 @@ at https://github.com/oawbz/rustdesk (AGPL-3.0).
 The Klink Windows tray Quit action stops its service and exits Klink processes while retaining the service registration, startup shortcut and installed files. Opening an installed Klink starts its service if stopped, and repairs a missing registration left by an older version. Starting or stopping the service may require UAC approval.
 
 Klink automatically generates an 8-character password for a new device. Existing passwords are preserved. Manual passwords require at least 6 characters, including an ASCII letter and a digit; uppercase/lowercase combinations and special characters are not required. Matching confirmation and the existing storage limit still apply.
+
+Klink disables public IPv6/STUN discovery in addition to WebRTC. IPv6 punching is unavailable in this build; self-hosted IPv4 negotiation, direct connections and relay remain. The installer does not show the external RustDesk privacy-page link. Source checks do not replace runtime packet-capture verification.

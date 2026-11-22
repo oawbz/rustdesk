@@ -149,6 +149,12 @@ pub fn allows_args(args: impl IntoIterator<Item = String>) -> bool {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use hbb_common::tokio;
+
+    #[tokio::test]
+    async fn host_does_not_start_public_ipv6_probe() {
+        assert!(crate::common::test_ipv6().await.is_none());
+    }
     #[test]
     fn outgoing_and_configuration_commands_are_rejected() {
         for arg in ["--connect", "--port-forward=123", "--option", "--password", "rustdesk://123"] {

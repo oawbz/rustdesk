@@ -230,7 +230,8 @@ class _InstallPageBodyState extends State<_InstallPageBody>
                         children: [
                           Text(translate('agreement_tip'))
                               .marginOnly(bottom: em),
-                          InkWell(
+                          if (bind.mainGetBuildinOption(key: 'host-only') != 'Y')
+                            InkWell(
                             hoverColor: Colors.transparent,
                             onTap: () => launchUrlString(
                                 'https://rustdesk.com/privacy.html'),
