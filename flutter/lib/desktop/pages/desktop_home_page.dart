@@ -813,6 +813,13 @@ class _DesktopHomePageState extends State<DesktopHomePage>
   @override
   void initState() {
     super.initState();
+    if (isWindows &&
+        bind.mainGetBuildinOption(key: 'host-only') == 'Y' &&
+        bind.mainIsInstalled()) {
+      start_service(true).catchError((Object error) {
+        debugPrint('Failed to restore Klink service: $error');
+      });
+    }
     _updateTimer = periodic_immediate(const Duration(seconds: 1), () async {
       await gFFI.serverModel.fetchID();
       final error = await bind.mainGetError();

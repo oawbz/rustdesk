@@ -3391,6 +3391,41 @@ pub fn try_lock_tray_single_instance() -> bool {
     }
 }
 
+#[cfg(feature = "host-only")]
+pub fn start_host_service() -> bool {
+    if is_self_service_running() {
+        return false;
+    }
+    if !is_installed_daemon() {
+        return install_service();
+    }
+    let commands = r#"powershell.exe -NoProfile -NonInteractive -Command "$ErrorActionPreference='Stop'; Start-Service -Name 'Klink'""#;
+    if let Err(error) = run_cmds(commands.to_owned(), false, "start_service") {
+        log::error!("Failed to start Klink service: {error:#}");
+        return true;
+    }
+    if let Err(error) = crate::run_me::<&str>(vec!["--tray"]) {
+        log::error!("Failed to restore Klink tray: {error:#}");
+    }
+    false
+}
+
+#[cfg(feature = "host-only")]
+pub fn exit_host() -> bool {
+    let commands = format!(
+        r#"powershell.exe -NoProfile -NonInteractive -Command "$ErrorActionPreference='Stop'; Stop-Service -Name 'Klink'"
+if not "%errorlevel%"=="0" exit /b %errorlevel%
+taskkill /F /IM Klink.exe /FI "PID ne {}"
+exit /b 0"#,
+        get_current_pid()
+    );
+    if let Err(error) = run_cmds(commands, false, "exit_host") {
+        log::error!("Failed to exit Klink: {error:#}");
+        return true;
+    }
+    std::process::exit(0);
+}
+
 /// Returns `true` on failure or cancellation so the caller keeps running.
 /// Successful removal exits this process instead of returning.
 pub fn uninstall_service(show_new_window: bool, _: bool) -> bool {

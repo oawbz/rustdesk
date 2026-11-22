@@ -462,7 +462,10 @@ pub fn set_auth_option(key: String, value: String) -> hbb_common::ResultType<()>
 #[inline]
 pub fn set_option(key: String, value: String) {
     #[cfg(feature = "host-only")]
-    if !crate::host_policy::allows_password_value(&key, &value) {
+    if !crate::host_policy::allows_password_value(&key, &value)
+        && !(cfg!(target_os = "windows")
+            && key == "stop-service" && matches!(value.as_str(), "" | "Y"))
+    {
         return;
     }
     if key == "2fa"
@@ -473,6 +476,15 @@ pub fn set_option(key: String, value: String) {
         return;
     }
     if &key == "stop-service" {
+        #[cfg(all(feature = "host-only", target_os = "windows"))]
+        if crate::platform::is_installed() {
+            if value == "Y" {
+                crate::platform::windows::exit_host();
+            } else {
+                crate::platform::windows::start_host_service();
+            }
+            return;
+        }
         #[cfg(target_os = "macos")]
         {
             let is_stop = value == "Y";
