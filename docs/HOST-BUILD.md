@@ -45,3 +45,5 @@ hbb_common submodule is pinned and unchanged. Source and license are available
 at https://github.com/oawbz/rustdesk (AGPL-3.0).
 
 被控版仅使用固定密码，主页修改按钮直接弹出改密窗口；不提供设置页面、一次性密码或授权方式切换。隐藏主页支持标语和安装说明文字，保留安装按钮。主程序和交付文件名均为 Klink.exe，使用独立 Klink 安装、服务和配置名称，避免与原版 RustDesk 冲突。
+
+The Windows tray menu retains the upstream Stop service action. It stops background remote access rather than merely closing the window.

@@ -61,7 +61,7 @@ pub fn apply() {
     let mut builtin = config::BUILTIN_SETTINGS.write().unwrap();
     for key in ["host-only", "hide-general-settings", "hide-security-settings", "hide-network-settings",
         "hide-help-cards", "hide-server-settings", "hide-proxy-settings",
-        "hide-remote-printer-settings", "hide-stop-service", "disable-change-id",
+        "hide-remote-printer-settings", "disable-change-id",
         "disable-unlock-pin"] {
         builtin.insert(key.to_owned(), "Y".to_owned());
     }
