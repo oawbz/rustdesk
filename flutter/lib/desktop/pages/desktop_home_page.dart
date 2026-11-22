@@ -649,6 +649,9 @@ class _DesktopHomePageState extends State<DesktopHomePage>
         );
       }
     }
+    if (bind.mainGetBuildinOption(key: 'host-only') == 'Y') {
+      return const SizedBox();
+    }
     if (bind.isIncomingOnly()) {
       final quitButtonText =
           bind.mainGetBuildinOption(key: kOptionQuitButtonText).trim();
