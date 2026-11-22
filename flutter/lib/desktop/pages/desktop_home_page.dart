@@ -1009,6 +1009,14 @@ class _DesktopHomePageState extends State<DesktopHomePage>
   }
 }
 
+class _HostLetterValidationRule extends ValidationRule {
+  @override
+  String get name => '字母';
+
+  @override
+  bool validate(String value) => value.contains(RegExp(r'[a-zA-Z]'));
+}
+
 void setPasswordDialog({VoidCallback? notEmptyCallback}) async {
   final isHostOnly = bind.mainGetBuildinOption(key: 'host-only') == 'Y';
   final p0 = TextEditingController(text: "");
@@ -1022,15 +1030,15 @@ void setPasswordDialog({VoidCallback? notEmptyCallback}) async {
   final presetPassword = permanentPasswordSet && !localPasswordSet;
   var canSubmit = false;
   final RxString rxPass = "".obs;
-  final rules = [
+  final rules = <ValidationRule>[
     DigitValidationRule(),
-    UppercaseValidationRule(),
-    LowercaseValidationRule(),
-    // SpecialCharacterValidationRule(),
-    MinCharactersValidationRule(8),
+    if (isHostOnly) _HostLetterValidationRule(),
+    if (!isHostOnly) UppercaseValidationRule(),
+    if (!isHostOnly) LowercaseValidationRule(),
+    MinCharactersValidationRule(isHostOnly ? 6 : 8),
   ];
   final maxLength = bind.mainMaxEncryptLen();
-  final statusTip = localPasswordSet
+  final statusTip = isHostOnly ? '' : localPasswordSet
       ? translate('password-hidden-tip')
       : (presetPassword ? translate('preset-password-in-use-tip') : '');
   final showStatusTipOnMobile =
@@ -1052,7 +1060,7 @@ void setPasswordDialog({VoidCallback? notEmptyCallback}) async {
         errMsg1 = "";
       });
       final pass = p0.text.trim();
-      if (pass.isNotEmpty && !isHostOnly) {
+      if (pass.isNotEmpty) {
         final Iterable violations = rules.where((r) => !r.validate(pass));
         if (violations.isNotEmpty) {
           setState(() {
@@ -1217,6 +1225,21 @@ void setPasswordDialog({VoidCallback? notEmptyCallback}) async {
           icon: Icon(Icons.done_rounded),
           onPressed: canSubmit ? submit : null,
         );
+        if (isHostOnly) {
+          return [
+            Align(
+              alignment: Alignment.centerRight,
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  cancelButton,
+                  const SizedBox(width: 8),
+                  okButton,
+                ]),
+              ),
+            ),
+          ];
+        }
         if (!isDesktop && !isWebDesktop && localPasswordSet) {
           return [
             Align(
