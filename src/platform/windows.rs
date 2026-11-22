@@ -3399,7 +3399,7 @@ pub fn start_host_service() -> bool {
     if !is_installed_daemon() {
         return install_service();
     }
-    let commands = r#"powershell.exe -NoProfile -NonInteractive -Command "$ErrorActionPreference='Stop'; Start-Service -Name 'Klink'""#;
+    let commands = r#""%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -Command "$ErrorActionPreference='Stop'; Start-Service -Name 'Klink'""#;
     if let Err(error) = run_cmds(commands.to_owned(), false, "start_service") {
         log::error!("Failed to start Klink service: {error:#}");
         return true;
@@ -3413,7 +3413,7 @@ pub fn start_host_service() -> bool {
 #[cfg(feature = "host-only")]
 pub fn exit_host() -> bool {
     let commands = format!(
-        r#"powershell.exe -NoProfile -NonInteractive -Command "$ErrorActionPreference='Stop'; Stop-Service -Name 'Klink'"
+        r#""%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -NonInteractive -Command "$ErrorActionPreference='Stop'; Stop-Service -Name 'Klink'"
 if not "%errorlevel%"=="0" exit /b %errorlevel%
 taskkill /F /IM Klink.exe /FI "PID ne {}"
 exit /b 0"#,
