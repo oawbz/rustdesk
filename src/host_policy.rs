@@ -5,6 +5,8 @@ pub const SERVER: &str = "home.awbz.cn";
 pub const PUBLIC_KEY: &str = "sUEp2zK93vGOtk21nS66OOL2CD3ughHpgj3PAzlZ+cQ=";
 
 pub fn apply() {
+    #[cfg(not(test))]
+    { *config::APP_NAME.write().unwrap() = "Klink".to_owned(); }
     *config::PROD_RENDEZVOUS_SERVER.write().unwrap() = SERVER.to_owned();
     *config::EXE_RENDEZVOUS_SERVER.write().unwrap() = SERVER.to_owned();
     let mut hard = config::HARD_SETTINGS.write().unwrap();

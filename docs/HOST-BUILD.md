@@ -1,8 +1,8 @@
 # Windows host-only build
 
-This fork's `host-only` Cargo feature builds an incoming-only RustDesk client.
-The executable is named `rustdesk.exe` and uses the standard RustDesk installation,
-service and configuration names.
+This fork's `host-only` Cargo feature builds an incoming-only client named Klink.
+The executable is named `Klink.exe`, with independent Klink installation,
+service and configuration names to avoid conflicts with stock RustDesk.
 ID and relay server: `home.awbz.cn`. API disabled. Public key:
 `sUEp2zK93vGOtk21nS66OOL2CD3ughHpgj3PAzlZ+cQ=`.
 
@@ -44,4 +44,4 @@ Upstream behavior is preserved when `host-only` is disabled. The shared
 hbb_common submodule is pinned and unchanged. Source and license are available
 at https://github.com/oawbz/rustdesk (AGPL-3.0).
 
-被控版仅使用固定密码，主页修改按钮直接弹出改密窗口；不提供设置页面、一次性密码或授权方式切换。隐藏主页支持标语和安装说明文字，保留安装按钮。主程序和交付文件名均为 rustdesk.exe，使用标准 RustDesk 安装及服务名称。
+被控版仅使用固定密码，主页修改按钮直接弹出改密窗口；不提供设置页面、一次性密码或授权方式切换。隐藏主页支持标语和安装说明文字，保留安装按钮。主程序和交付文件名均为 Klink.exe，使用独立 Klink 安装、服务和配置名称，避免与原版 RustDesk 冲突。
