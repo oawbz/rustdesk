@@ -89,7 +89,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
         alignment: Alignment.center,
         child: loadLogo(),
       ),
-      buildTip(context),
+      if (bind.mainGetBuildinOption(key: 'host-only') != 'Y') buildTip(context),
       if (!isOutgoingOnly) buildIDBoard(context),
       if (!isOutgoingOnly) buildPasswordBoard(context),
       if (bind.mainGetBuildinOption(key: 'host-only') == 'Y')
