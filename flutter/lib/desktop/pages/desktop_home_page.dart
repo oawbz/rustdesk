@@ -358,9 +358,37 @@ class _DesktopHomePageState extends State<DesktopHomePage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AutoSizeText(
-                    translate(bind.mainGetBuildinOption(key: 'host-only') == 'Y' && !showOneTime
-                        ? "Use permanent password" : "One-time Password"),
+                  if (bind.mainGetBuildinOption(key: 'host-only') == 'Y')
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            translate('Use permanent password'),
+                            style: TextStyle(fontSize: 14, color: textColor?.withOpacity(0.5)),
+                          ).marginOnly(top: 5),
+                        ),
+                        Row(mainAxisSize: MainAxisSize.min, children: [
+                          IconButton(
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints.tightFor(width: 24, height: 24),
+                            icon: const Icon(Icons.copy, size: 18),
+                            tooltip: '复制密码',
+                            onPressed: () => _copyHostCredentials(includeId: false),
+                          ),
+                          IconButton(
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints.tightFor(width: 24, height: 24),
+                            icon: const Icon(Icons.edit, size: 18),
+                            tooltip: translate('Change Password'),
+                            onPressed: () => setPasswordDialog(),
+                          ),
+                        ]),
+                      ],
+                    )
+                  else AutoSizeText(
+                    translate("One-time Password"),
                     style: TextStyle(
                         fontSize: 14, color: textColor?.withOpacity(0.5)),
                     maxLines: 1,
@@ -419,13 +447,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                           ),
                           onHover: (value) => refreshHover.value = value,
                         ).marginOnly(right: 8, top: 4),
-                      if (bind.mainGetBuildinOption(key: 'host-only') == 'Y')
-                        IconButton(
-                          icon: const Icon(Icons.copy, size: 18),
-                          tooltip: '复制密码',
-                          onPressed: () => _copyHostCredentials(includeId: false),
-                        ),
-                      if (bind.mainGetBuildinOption(key: 'host-only') == 'Y' || !bind.isDisableSettings())
+                      if (bind.mainGetBuildinOption(key: 'host-only') != 'Y' && !bind.isDisableSettings())
                         InkWell(
                           child: Tooltip(
                             message: translate('Change Password'),
