@@ -376,7 +376,21 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                               showToast(translate("Copied"));
                             }
                           },
-                          child: TextFormField(
+                          child: bind.mainGetBuildinOption(key: 'host-only') == 'Y'
+                              ? FutureBuilder<String>(
+                                  future: bind.mainGetCommon(key: 'host-generated-password'),
+                                  builder: (context, snapshot) => Padding(
+                                    padding: const EdgeInsets.only(top: 14, bottom: 10),
+                                    child: SelectableText(
+                                      snapshot.data?.isNotEmpty == true
+                                          ? snapshot.data!
+                                          : snapshot.connectionState == ConnectionState.waiting
+                                              ? '…' : '已设置固定密码',
+                                      style: const TextStyle(fontSize: 15),
+                                    ),
+                                  ),
+                                )
+                              : TextFormField(
                             controller: model.serverPasswd,
                             readOnly: true,
                             decoration: InputDecoration(
