@@ -80,7 +80,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
     final isOutgoingOnly = bind.isOutgoingOnly();
     final children = <Widget>[
       if (!isOutgoingOnly) buildPresetPasswordWarning(),
-      if (bind.isCustomClient())
+      if (bind.isCustomClient() && bind.mainGetBuildinOption(key: 'host-only') != 'Y')
         Align(
           alignment: Alignment.center,
           child: loadPowered(context),
@@ -264,7 +264,8 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                               tooltip: '复制 ID',
                               onPressed: () => _copyHostCredentials(includePassword: false),
                             ),
-                          buildPopupMenu(context),
+                          if (bind.mainGetBuildinOption(key: 'host-only') != 'Y')
+                            buildPopupMenu(context),
                         ])
                       ],
                     ),
@@ -446,8 +447,13 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                               ).marginOnly(right: 8, top: 4),
                             ),
                           ),
-                          onTap: () => DesktopSettingPage.switch2page(
-                              SettingsTabKey.safety),
+                          onTap: () {
+                            if (bind.mainGetBuildinOption(key: 'host-only') == 'Y') {
+                              setPasswordDialog();
+                            } else {
+                              DesktopSettingPage.switch2page(SettingsTabKey.safety);
+                            }
+                          },
                           onHover: (value) => editHover.value = value,
                         ),
                     ],
@@ -723,7 +729,8 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                             ]
                           : <Widget>[]) +
                       <Widget>[
-                        if (content.isNotEmpty)
+                        if (content.isNotEmpty &&
+                            !(bind.mainGetBuildinOption(key: 'host-only') == 'Y' && content == 'install_tip'))
                           Text(
                             translate(content),
                             style: TextStyle(
@@ -1206,7 +1213,7 @@ void setPasswordDialog({VoidCallback? notEmptyCallback}) async {
         }
         return [
           cancelButton,
-          if (localPasswordSet) removeButton,
+          if (localPasswordSet && bind.mainGetBuildinOption(key: 'host-only') != 'Y') removeButton,
           okButton,
         ];
       })(),

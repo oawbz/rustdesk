@@ -34,6 +34,8 @@ pub fn apply() {
         ("api-server", ""),
         ("key", PUBLIC_KEY),
         ("access-mode", "full"),
+        ("verification-method", "use-permanent-password"),
+        ("approve-mode", "password"),
         ("enable-keyboard", "Y"),
         ("enable-clipboard", "Y"),
         ("enable-file-transfer", "Y"),
@@ -85,9 +87,9 @@ pub fn is_password_option(key: &str) -> bool {
 
 pub fn allows_password_value(key: &str, value: &str) -> bool {
     match key {
-        "verification-method" => matches!(value, "use-temporary-password" | "use-permanent-password" | "use-both-passwords"),
+        "verification-method" => value == "use-permanent-password",
         "temporary-password-length" => matches!(value, "6" | "8" | "10"),
-        "approve-mode" => matches!(value, "" | "password" | "click" | "password-click"),
+        "approve-mode" => value == "password",
         "allow-numeric-one-time-password" => matches!(value, "" | "Y" | "N"),
         _ => false,
     }
@@ -171,7 +173,7 @@ mod tests {
         assert!(!config::Config::is_disable_change_permanent_password());
         config::Config::set_option("verification-method".into(), "use-both-passwords".into());
         apply();
-        assert_eq!(config::Config::get_option("verification-method"), "use-both-passwords");
+        assert_eq!(config::Config::get_option("verification-method"), "use-permanent-password");
         assert!(config::Config::set_permanent_password(""));
         assert!(provision_password().is_ok());
         let password = generated_password();
@@ -187,7 +189,8 @@ mod tests {
     #[test]
     fn only_password_settings_accept_changes() {
         assert!(allows_password_value("verification-method", "use-permanent-password"));
-        assert!(allows_password_value("approve-mode", "password-click"));
+        assert!(!allows_password_value("approve-mode", "password-click"));
+        assert!(!allows_password_value("verification-method", "use-both-passwords"));
         assert!(allows_password_value("temporary-password-length", "8"));
         assert!(!allows_password_value("temporary-password-length", "1"));
         assert!(!allows_password_value("relay-server", "other.example"));

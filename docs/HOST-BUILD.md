@@ -43,3 +43,5 @@ Windows service is wanted. The test executable is unsigned.
 Upstream behavior is preserved when `host-only` is disabled. The shared
 hbb_common submodule is pinned and unchanged. Source and license are available
 at https://github.com/oawbz/rustdesk (AGPL-3.0).
+
+被控版仅使用固定密码，主页修改按钮直接弹出改密窗口；不提供设置页面、一次性密码或授权方式切换。隐藏主页支持标语和安装说明文字，保留安装按钮。安装载荷的主程序名称统一为 AwbzHost.exe。
