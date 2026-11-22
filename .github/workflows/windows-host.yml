@@ -219,7 +219,6 @@ jobs:
           python3 .\build.py --host-only --portable --flutter --skip-portable-pack --hwcodec --vram
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Move-Item ./flutter/build/windows/x64/runner/Release ./rustdesk
-          Rename-Item ./rustdesk/rustdesk.exe AwbzHost.exe
 
       - name: Test host policy
         shell: bash
@@ -233,16 +232,15 @@ jobs:
           if [ -n "$runner_res" ]; then cp "$runner_res" libs/portable/Runner.res; fi
           sed -i '/dpiAware/d' res/manifest.xml
           python -m pip install -r libs/portable/requirements.txt
-          test -f rustdesk/AwbzHost.exe
-          test ! -f rustdesk/rustdesk.exe
+          test -f rustdesk/rustdesk.exe
           pushd libs/portable
-          python generate.py -f ../../rustdesk/ -o . -e ../../rustdesk/AwbzHost.exe
+          python generate.py -f ../../rustdesk/ -o . -e ../../rustdesk/rustdesk.exe
           popd
           mkdir -p dist
-          cp target/release/rustdesk-portable-packer.exe dist/rustdesk-host-windows-x64.exe
+          cp target/release/rustdesk-portable-packer.exe dist/rustdesk.exe
           cp LICENCE dist/LICENCE.txt
           cp docs/HOST-BUILD.md dist/README.md
-          (cd dist && sha256sum rustdesk-host-windows-x64.exe > SHA256SUMS)
+          (cd dist && sha256sum rustdesk.exe > SHA256SUMS)
           git rev-parse HEAD > dist/SOURCE-COMMIT.txt
 
       - name: Upload Windows EXE

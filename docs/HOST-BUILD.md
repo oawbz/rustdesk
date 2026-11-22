@@ -1,13 +1,13 @@
 # Windows host-only build
 
-This fork's `host-only` Cargo feature builds an incoming-only client named
-`AwbzHost`, with its own configuration, Windows service and installation path
-to avoid reusing an existing RustDesk controller's configuration.
+This fork's `host-only` Cargo feature builds an incoming-only RustDesk client.
+The executable is named `rustdesk.exe` and uses the standard RustDesk installation,
+service and configuration names.
 ID and relay server: `home.awbz.cn`. API disabled. Public key:
 `sUEp2zK93vGOtk21nS66OOL2CD3ughHpgj3PAzlZ+cQ=`.
 
 The UI shows the device ID, password controls, status, and installation/service
-notices. Only the password settings card remains accessible; other settings and
+button. Permanent password changes open a dialog directly; settings pages and
 outgoing sessions are blocked. Installation, uninstall, the Windows service, incoming desktop,
 clipboard, audio, file transfer, TCP tunneling and restart remain available.
 Remote permissions default to full access, including terminal, camera and
@@ -44,4 +44,4 @@ Upstream behavior is preserved when `host-only` is disabled. The shared
 hbb_common submodule is pinned and unchanged. Source and license are available
 at https://github.com/oawbz/rustdesk (AGPL-3.0).
 
-被控版仅使用固定密码，主页修改按钮直接弹出改密窗口；不提供设置页面、一次性密码或授权方式切换。隐藏主页支持标语和安装说明文字，保留安装按钮。安装载荷的主程序名称统一为 AwbzHost.exe。
+被控版仅使用固定密码，主页修改按钮直接弹出改密窗口；不提供设置页面、一次性密码或授权方式切换。隐藏主页支持标语和安装说明文字，保留安装按钮。主程序和交付文件名均为 rustdesk.exe，使用标准 RustDesk 安装及服务名称。
