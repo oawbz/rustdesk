@@ -425,28 +425,6 @@ class _DesktopHomePageState extends State<DesktopHomePage>
                           tooltip: '复制密码',
                           onPressed: () => _copyHostCredentials(includeId: false),
                         ),
-                      if (bind.mainGetBuildinOption(key: 'host-only') == 'Y')
-                        IconButton(
-                          icon: const Icon(Icons.visibility_outlined),
-                          tooltip: '查看初始固定密码',
-                          onPressed: () async {
-                            final password = await bind.mainGetCommon(key: 'host-generated-password');
-                            if (!mounted) return;
-                            showDialog<void>(context: context, builder: (dialogContext) => AlertDialog(
-                              title: const Text('初始固定密码'),
-                              content: SelectableText(password.isEmpty
-                                  ? '固定密码已由用户设置，请使用自己的密码；也可在密码设置中修改。'
-                                  : password),
-                              actions: [
-                                if (password.isNotEmpty) TextButton(
-                                  onPressed: () => Clipboard.setData(ClipboardData(text: password)),
-                                  child: Text(translate('Copy'))),
-                                TextButton(onPressed: () => Navigator.pop(dialogContext),
-                                  child: Text(translate('Close'))),
-                              ],
-                            ));
-                          },
-                        ),
                       if (bind.mainGetBuildinOption(key: 'host-only') == 'Y' || !bind.isDisableSettings())
                         InkWell(
                           child: Tooltip(
