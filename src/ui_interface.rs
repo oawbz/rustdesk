@@ -464,7 +464,7 @@ pub fn set_option(key: String, value: String) {
     #[cfg(feature = "host-only")]
     if !crate::host_policy::allows_password_value(&key, &value)
         && !(cfg!(target_os = "windows")
-            && key == "stop-service" && matches!(value.as_str(), "" | "Y"))
+            && key == "stop-service" && crate::host_policy::allows_service_value(&value))
     {
         return;
     }

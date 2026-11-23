@@ -85,6 +85,10 @@ pub fn is_password_option(key: &str) -> bool {
         "approve-mode" | "allow-numeric-one-time-password")
 }
 
+pub fn allows_service_value(value: &str) -> bool {
+    matches!(value, "" | "Y" | "N")
+}
+
 pub fn allows_password_value(key: &str, value: &str) -> bool {
     match key {
         "verification-method" => value == "use-permanent-password",
@@ -201,6 +205,14 @@ mod tests {
         assert!(!allows_password_value("temporary-password-length", "1"));
         assert!(!allows_password_value("relay-server", "other.example"));
     }
+    #[test]
+    fn custom_client_service_start_value_is_allowed() {
+        assert!(allows_service_value("N"));
+        assert!(allows_service_value(""));
+        assert!(allows_service_value("Y"));
+        assert!(!allows_service_value("unexpected"));
+    }
+
     #[test]
     fn installation_and_service_commands_are_preserved() {
         for arg in ["--install", "--uninstall", "--service", "--server", "--cm", "--elevate", "--silent-install"] {
