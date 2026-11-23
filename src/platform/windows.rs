@@ -3394,6 +3394,9 @@ pub fn try_lock_tray_single_instance() -> bool {
 #[cfg(feature = "host-only")]
 pub fn start_host_service() -> bool {
     if is_self_service_running() {
+        if let Err(error) = crate::run_me::<&str>(vec!["--tray"]) {
+            log::error!("Failed to restore Klink tray: {error:#}");
+        }
         return false;
     }
     if !is_installed_daemon() {

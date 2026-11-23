@@ -221,6 +221,10 @@ jobs:
           Move-Item ./flutter/build/windows/x64/runner/Release ./rustdesk
           Rename-Item ./rustdesk/rustdesk.exe Klink.exe
 
+      - name: Test Klink UI
+        working-directory: flutter
+        run: flutter test test/klink_panel_test.dart
+
       - name: Test host policy
         shell: bash
         run: cargo test --locked --release --lib --features host-only,flutter,hwcodec,vram host_policy::tests

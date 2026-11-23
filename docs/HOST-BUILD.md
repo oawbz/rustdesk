@@ -51,3 +51,5 @@ The Klink Windows tray Quit action stops its service and exits Klink processes w
 Klink automatically generates an 8-character password for a new device. Existing passwords are preserved. Manual passwords require at least 6 characters, including an ASCII letter and a digit; uppercase/lowercase combinations and special characters are not required. Matching confirmation and the existing storage limit still apply.
 
 Klink disables public IPv6/STUN discovery in addition to WebRTC. IPv6 punching is unavailable in this build; self-hosted IPv4 negotiation, direct connections and relay remain. The installer does not show the external RustDesk privacy-page link. Source checks do not replace runtime packet-capture verification.
+
+Klink uses compact credential cards and a dedicated password dialog with inline validation and same-row actions. The installation and missing-service recovery actions remain available; no upgrade entry is shown. Reopening an installed Klink restores its tray even when the service is already running; the existing per-session tray lock prevents duplicate tray processes.

@@ -24,6 +24,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:window_size/window_size.dart' as window_size;
 import '../widgets/button.dart';
+import '../widgets/klink_panel.dart';
 
 class DesktopHomePage extends StatefulWidget {
   const DesktopHomePage({Key? key}) : super(key: key);
@@ -79,6 +80,19 @@ class _DesktopHomePageState extends State<DesktopHomePage>
     final isIncomingOnly = bind.isIncomingOnly();
     final isOutgoingOnly = bind.isOutgoingOnly();
     final children = <Widget>[
+      if (bind.mainGetBuildinOption(key: 'host-only') == 'Y')
+        ChangeNotifierProvider.value(
+          value: gFFI.serverModel,
+          child: Consumer<ServerModel>(builder: (context, model, _) => KlinkPanel(
+            id: model.serverId.text,
+            password: bind.mainGetCommon(key: 'host-generated-password'),
+            onCopyId: () => _copyHostCredentials(includePassword: false),
+            onCopyPassword: () => _copyHostCredentials(includeId: false),
+            onCopyAll: () => _copyHostCredentials(),
+            onEdit: () => _showKlinkPasswordDialog(context),
+          )),
+        )
+      else ...[
       if (!isOutgoingOnly) buildPresetPasswordWarning(),
       if (bind.isCustomClient() && bind.mainGetBuildinOption(key: 'host-only') != 'Y')
         Align(
@@ -101,6 +115,7 @@ class _DesktopHomePageState extends State<DesktopHomePage>
             label: const Text('复制 ID 和密码'),
           ),
         ),
+      ],
       FutureBuilder<Widget>(
         future: Future.value(
             Obx(() => buildHelpCards(stateGlobal.updateUrl.value))),
@@ -699,6 +714,16 @@ class _DesktopHomePageState extends State<DesktopHomePage>
             (btnText == 'Install' || btnText == 'Click to upgrade'))) {
       return const SizedBox();
     }
+    if (bind.mainGetBuildinOption(key: 'host-only') == 'Y') {
+      if (btnText == 'Click to upgrade') return const SizedBox();
+      return KlinkInstallAction(
+        label: content == 'install_daemon_tip' ? '恢复服务'
+            : btnText == 'Install' ? '安装到系统' : translate(btnText),
+        message: content == 'install_tip' || content == 'install_daemon_tip' ? ''
+            : translate(content.isEmpty ? title : content),
+        onPressed: onPressed,
+      );
+    }
     void closeCard() async {
       if (closeOption != null) {
         await bind.mainSetLocalOption(key: closeOption, value: 'N');
@@ -1009,6 +1034,21 @@ class _DesktopHomePageState extends State<DesktopHomePage>
   }
 }
 
+Future<void> _showKlinkPasswordDialog(BuildContext context, {VoidCallback? onSaved}) {
+  return showDialog<void>(
+    context: context,
+    barrierDismissible: false,
+    builder: (_) => KlinkPasswordDialog(
+      maxLength: bind.mainMaxEncryptLen(),
+      onSave: (password) async {
+        final ok = await bind.mainSetPermanentPasswordWithResult(password: password);
+        if (ok) onSaved?.call();
+        return ok;
+      },
+    ),
+  );
+}
+
 class _HostLetterValidationRule extends ValidationRule {
   @override
   String get name => '字母';
@@ -1019,6 +1059,13 @@ class _HostLetterValidationRule extends ValidationRule {
 
 void setPasswordDialog({VoidCallback? notEmptyCallback}) async {
   final isHostOnly = bind.mainGetBuildinOption(key: 'host-only') == 'Y';
+  if (isHostOnly) {
+    final context = Get.context;
+    if (context != null) {
+      await _showKlinkPasswordDialog(context, onSaved: notEmptyCallback);
+    }
+    return;
+  }
   final p0 = TextEditingController(text: "");
   final p1 = TextEditingController(text: "");
   var errMsg0 = "";
